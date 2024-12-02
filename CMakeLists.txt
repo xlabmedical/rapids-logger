@@ -18,13 +18,14 @@ include_guard(GLOBAL)
 
 cmake_minimum_required(VERSION 3.26.4 FATAL_ERROR)
 
-include(../rapids_config.cmake)
+include(rapids_config.cmake)
 
 include(rapids-cmake)
 include(rapids-cpm)
 
 project(
   RAPIDS_LOGGER
+  # TODO: Determine appropriate versioning.
   VERSION 0.0.1
   LANGUAGES CXX)
 
@@ -32,7 +33,7 @@ rapids_cmake_build_type(Release)
 
 rapids_cpm_init()
 
-include(../cmake/thirdparty/get_spdlog.cmake)
+include(get_spdlog.cmake)
 
 #[=======================================================================[.rst:
 rapids_make_logger
