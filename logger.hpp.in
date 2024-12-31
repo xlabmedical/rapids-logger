@@ -270,7 +270,6 @@ class logger {
     log(level_enum::critical, format, std::forward<Args>(args)...);
   }
 
-  // Everything below here is conditionally compiled based on whether logging is supported.
   /**
    * @brief Construct a new logger object
    *
@@ -424,6 +423,16 @@ class null_sink_mt : public sink {
   null_sink_mt();
 };
 
+/**
+ * @brief A sink that writes to stderr.
+ *
+ * See spdlog::sinks::stderr_sink_mt for more information.
+ */
+class stderr_sink_mt : public sink {
+ public:
+  stderr_sink_mt();
+};
+
 typedef void (*log_callback_t)(int lvl, const char* msg);
 typedef void (*flush_callback_t)();
 
@@ -443,12 +452,10 @@ public:
  *
  * @return std::string The default log file name.
  */
-inline std::string default_log_filename()
+inline sink_ptr default_sink()
 {
   auto* filename = std::getenv("@_RAPIDS_LOGGER_MACRO_PREFIX@_DEBUG_LOG_FILE");
-  // TODO: Do we prefer rmm's default (a file rmm_log.txt) or cudf's default (a
-  // stderr sink)? I think the latter is better.
-  return (filename == nullptr) ? std::string{"@_RAPIDS_LOGGER_NAMESPACE@_log.txt"} : std::string{filename};
+  return (filename == nullptr) ? static_cast<sink_ptr>(std::make_shared<stderr_sink_mt>()) : static_cast<sink_ptr>(std::make_shared<basic_file_sink_mt>(filename, true));
 }
 
 /**
@@ -467,7 +474,7 @@ inline logger& default_logger()
 {
   static logger logger_ = [] {
     logger logger_ {
-      "@_RAPIDS_LOGGER_MACRO_PREFIX@", default_log_filename()
+      "@_RAPIDS_LOGGER_MACRO_PREFIX@", {default_sink()}
     };
 #if @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_ACTIVE_LEVEL <= @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_INFO
 #ifdef CUDA_API_PER_THREAD_DEFAULT_STREAM
