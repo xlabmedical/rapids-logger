@@ -31,7 +31,7 @@
   #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __attribute__((visibility("default")))
 #endif
 
-namespace @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT_NAMESPACE @_RAPIDS_LOGGER_NAMESPACE@ {
+namespace @_RAPIDS_LOGGER_NAMESPACE@ {
 
 // These values must be kept in sync with spdlog!
 #define @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_TRACE    0
