@@ -21,7 +21,13 @@
 #include <string>
 #include <vector>
 
-namespace __attribute__((visibility("default"))) @_RAPIDS_LOGGER_NAMESPACE@ {
+#ifdef _WIN32
+  #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __declspec(dllexport)
+#else
+  #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __attribute__((visibility("default")))
+#endif
+
+namespace @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT @_RAPIDS_LOGGER_NAMESPACE@ {
 
 // These values must be kept in sync with spdlog!
 #define @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_TRACE    0
