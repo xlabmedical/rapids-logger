@@ -22,12 +22,16 @@
 #include <vector>
 
 #ifdef _WIN32
-  #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __declspec(dllexport)
+  #ifdef @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT_BUILD
+    #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __declspec(dllexport)
+  #else
+    #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __declspec(dllimport)
+  #endif
 #else
   #define @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT __attribute__((visibility("default")))
 #endif
 
-namespace @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT @_RAPIDS_LOGGER_NAMESPACE@ {
+namespace @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT_NAMESPACE @_RAPIDS_LOGGER_NAMESPACE@ {
 
 // These values must be kept in sync with spdlog!
 #define @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_TRACE    0
@@ -43,7 +47,7 @@ namespace @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT @_RAPIDS_LOGGER_NAMESPACE@ {
  *
  * These levels correspond to the levels defined by spdlog.
  */
-enum class level_enum : int32_t {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT enum class level_enum : int32_t {
   trace    = @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_TRACE,
   debug    = @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_DEBUG,
   info     = @_RAPIDS_LOGGER_MACRO_PREFIX@_LOG_LEVEL_INFO,
@@ -69,7 +73,7 @@ using sink_ptr = std::shared_ptr<sink>;
  * @brief A logger class that either uses the real implementation (via spdlog) or performs no-ops if
  * not supported.
  */
-class logger {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class logger {
  public:
   logger() = delete;  ///< Not default constructible
   logger(logger const&) = delete;  ///< Not copy constructible
@@ -83,7 +87,7 @@ class logger {
    *
    * This class is used internally by the logger class to manage its sinks. It handles synchronization of the sinks with the sinks in the underlying spdlog logger such that all vector-like operations performed on this class are reflected in the underlying spdlog logger's set of sinks.
    */
-  class sink_vector {
+  @_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class sink_vector {
    public:
     using Iterator = std::vector<sink_ptr>::iterator;  ///< The iterator type
     using ConstIterator = std::vector<sink_ptr>::const_iterator;  ///< The const iterator type
@@ -389,7 +393,7 @@ class logger {
  * These sinks are wrappers around the spdlog sinks that allow us to keep the
  * spdlog types private and avoid exposing them in the public API.
  */
-class sink {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class sink {
  public:
   ~sink();
  protected:
@@ -404,7 +408,7 @@ class sink {
  *
  * See spdlog::sinks::basic_file_sink_mt for more information.
  */
-class basic_file_sink_mt : public sink {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class basic_file_sink_mt : public sink {
  public:
   basic_file_sink_mt(std::string const& filename, bool truncate = false);
 };
@@ -414,7 +418,7 @@ class basic_file_sink_mt : public sink {
  *
  * See spdlog::sinks::ostream_sink_mt for more information.
  */
-class ostream_sink_mt : public sink {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class ostream_sink_mt : public sink {
  public:
   ostream_sink_mt(std::ostream& stream, bool force_flush = false);
 };
@@ -424,7 +428,7 @@ class ostream_sink_mt : public sink {
  *
  * See spdlog::sinks::null_sink_mt for more information.
  */
-class null_sink_mt : public sink {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class null_sink_mt : public sink {
  public:
   null_sink_mt();
 };
@@ -434,7 +438,7 @@ class null_sink_mt : public sink {
  *
  * See spdlog::sinks::stderr_sink_mt for more information.
  */
-class stderr_sink_mt : public sink {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class stderr_sink_mt : public sink {
  public:
   stderr_sink_mt();
 };
@@ -445,7 +449,7 @@ typedef void (*flush_callback_t)();
 /**
  * @brief A sink that executes a callback whenever a message is logged.
  */
-class callback_sink_mt : public sink {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT class callback_sink_mt : public sink {
 public:
     explicit callback_sink_mt(const log_callback_t &callback, const flush_callback_t &flush = nullptr);
 };
@@ -501,7 +505,7 @@ inline logger& default_logger()
  * Instances will set the logging to the level indicated on construction and
  * will revert to the previous set level on destruction.
  */
-struct log_level_setter {
+@_RAPIDS_LOGGER_MACRO_PREFIX@_EXPORT struct log_level_setter {
   explicit log_level_setter(level_enum level)
   {
     prev_level_ = default_logger().level();

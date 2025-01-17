@@ -176,6 +176,14 @@ function(rapids_make_logger logger_namespace)
               "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
   target_compile_features(${_RAPIDS_LOGGER_TARGET} INTERFACE cxx_std_17)
 
+  # Handle symbol exporting on windows, since we cannot export the whole namespace as we do with clang/gcc
+  if(MSVC)
+    target_compile_definitions(
+      ${_RAPIDS_LOGGER_TARGET}
+      INTERFACE "$<BUILD_INTERFACE:${_RAPIDS_LOGGER_MACRO_PREFIX}_EXPORT_BUILD>"
+    )
+  endif()
+
   # Create an interface target that will trigger compilation of the logger implementation in any
   # target that is linked to it.
   set(LOGGER_IMPL_SRC_OUTPUT_FILE ${BUILD_DIR}/logger_impl/logger.cpp)
